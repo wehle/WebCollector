@@ -3,19 +3,12 @@ WebCollector is an open source web crawler framework based on Java.It provides
   some simple interfaces for crawling the Web,you can setup a
   multi-threaded web crawler in less than 5 minutes.
 
-
-
-
 ## HomePage
 [https://github.com/CrawlScript/WebCollector](https://github.com/CrawlScript/WebCollector)
 
-<!--
-## Document
-[WebCollector-GitDoc](https://github.com/CrawlScript/WebCollector-GitDoc)
--->
-
 
 ## Installation
+
 
 ### Using Maven
 
@@ -23,9 +16,10 @@ WebCollector is an open source web crawler framework based on Java.It provides
 <dependency>
     <groupId>cn.edu.hfut.dmic.webcollector</groupId>
     <artifactId>WebCollector</artifactId>
-    <version>2.71</version>
+    <version>2.73-alpha</version>
 </dependency>
 ```
+
 
 ### Without Maven
 WebCollector jars are available on the [HomePage](https://github.com/CrawlScript/WebCollector).
@@ -34,60 +28,100 @@ WebCollector jars are available on the [HomePage](https://github.com/CrawlScript
 
 
 
+## Example Index
+
+Annotation versions are named with `DemoAnnotatedxxxxxx.java`.
+
+### Basic
+
++ [DemoAutoNewsCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAutoNewsCrawler.java) | [DemoAnnotatedAutoNewsCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAnnotatedAutoNewsCrawler.java)
++ [DemoManualNewsCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoManualNewsCrawler.java) | [DemoAnnotatedManualNewsCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAnnotatedManualNewsCrawler.java)
++ [DemoExceptionCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoExceptionCrawler.java)
+
+### CrawlDatum and MetaData
+
++ [DemoMetaCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoMetaCrawler.java)
++ [DemoAnnotatedMatchTypeCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAnnotatedMatchTypeCrawler.java)
++ [DemoAnnotatedDepthCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAnnotatedDepthCrawler.java)
++ [DemoBingCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoBingCrawler.java) | [DemoAnnotatedBingCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAnnotatedBingCrawler.java)
++ [DemoAnnotatedDepthCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAnnotatedDepthCrawler.java)
+
+### Http Request and Javascript
+
++ [DemoCookieCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoCookieCrawler.java)
++ [DemoRedirectCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoRedirectCrawler.java)  | [DemoAnnotatedRedirectCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAnnotatedRedirectCrawler.java)
++ [DemoPostCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoPostCrawler.java)
++ [DemoRandomProxyCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoRandomProxyCrawler.java)
++ [AbuyunDynamicProxyRequester.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/AbuyunDynamicProxyRequester.java)
++ [DemoSeleniumCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoSeleniumCrawler.java)
+
+### NextFilter
+
++ [DemoNextFilter.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoNextFilter.java)
++ [DemoHashSetNextFilter.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoHashSetNextFilter.java)
+
+
+
+
+
 
 ## Quickstart
-Lets crawl some news from hfut news.This demo prints out the titles and contents extracted from news of hfut news.
+Lets crawl some news from github news.This demo prints out the titles and contents extracted from news of github news.
 
 ### Automatically Detecting URLs
 
-[AutoNewsCrawler.java](https://github.com/CrawlScript/WebCollector/blob/master/AutoNewsCrawler.java):
+[DemoAutoNewsCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoAutoNewsCrawler.java):
 
 ```java
 
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
-import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
-import org.jsoup.nodes.Document;
+import cn.edu.hfut.dmic.webcollector.plugin.rocks.BreadthCrawler;
 
 /**
- * Crawling news from hfut news
+ * Crawling news from github news
  *
  * @author hu
  */
-public class AutoNewsCrawler extends BreadthCrawler {
+public class DemoAutoNewsCrawler extends BreadthCrawler {
     /**
      * @param crawlPath crawlPath is the path of the directory which maintains
      *                  information of this crawler
      * @param autoParse if autoParse is true,BreadthCrawler will auto extract
      *                  links which match regex rules from pag
      */
-    public AutoNewsCrawler(String crawlPath, boolean autoParse) {
+    public DemoAutoNewsCrawler(String crawlPath, boolean autoParse) {
         super(crawlPath, autoParse);
-        /*start page*/
-        this.addSeed("http://news.hfut.edu.cn/list-1-1.html");
+        /*start pages*/
+        this.addSeed("https://blog.github.com/");
+        for(int pageIndex = 2; pageIndex <= 5; pageIndex++) {
+            String seedUrl = String.format("https://blog.github.com/page/%d/", pageIndex);
+            this.addSeed(seedUrl);
+        }
 
-        /*fetch url like http://news.hfut.edu.cn/show-xxxxxxhtml*/
-        this.addRegex("http://news.hfut.edu.cn/show-.*html");
+        /*fetch url like "https://blog.github.com/2018-07-13-graphql-for-octokit/" */
+        this.addRegex("https://blog.github.com/[0-9]{4}-[0-9]{2}-[0-9]{2}-[^/]+/");
         /*do not fetch jpg|png|gif*/
-        this.addRegex("-.*\\.(jpg|png|gif).*");
+        //this.addRegex("-.*\\.(jpg|png|gif).*");
         /*do not fetch url contains #*/
-        this.addRegex("-.*#.*");
+        //this.addRegex("-.*#.*");
 
         setThreads(50);
         getConf().setTopN(100);
 
-//        setResumable(true);
+        //enable resumable mode
+        //setResumable(true);
     }
 
     @Override
     public void visit(Page page, CrawlDatums next) {
         String url = page.url();
         /*if page is news page*/
-        if (page.matchUrl("http://news.hfut.edu.cn/show-.*html")) {
+        if (page.matchUrl("https://blog.github.com/[0-9]{4}-[0-9]{2}-[0-9]{2}[^/]+/")) {
 
             /*extract title and content of news by css selector*/
-            String title = page.select("div[id=Article]>h2").first().text();
-            String content = page.selectText("div#artibody");
+            String title = page.select("h1[class=lh-condensed]").first().text();
+            String content = page.selectText("div.content.markdown-body");
 
             System.out.println("URL:\n" + url);
             System.out.println("title:\n" + title);
@@ -102,7 +136,7 @@ public class AutoNewsCrawler extends BreadthCrawler {
     }
 
     public static void main(String[] args) throws Exception {
-        AutoNewsCrawler crawler = new AutoNewsCrawler("crawl", true);
+        DemoAutoNewsCrawler crawler = new DemoAutoNewsCrawler("crawl", true);
         /*start crawl with depth of 4*/
         crawler.start(4);
     }
@@ -115,41 +149,41 @@ public class AutoNewsCrawler extends BreadthCrawler {
 ### Manually Detecting URLs
 
 
-[ManualNewsCrawler.java](https://github.com/CrawlScript/WebCollector/blob/master/ManualNewsCrawler.java):
+[DemoManualNewsCrawler.java](src/main/java/cn/edu/hfut/dmic/webcollector/example/DemoManualNewsCrawler.java):
 
 ```java
 
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
-import cn.edu.hfut.dmic.webcollector.plugin.berkeley.BreadthCrawler;
-import org.jsoup.nodes.Document;
+import cn.edu.hfut.dmic.webcollector.plugin.rocks.BreadthCrawler;
 
 /**
- * Crawling news from hfut news
+ * Crawling news from github news
  *
  * @author hu
  */
-public class ManualNewsCrawler extends BreadthCrawler {
+public class DemoManualNewsCrawler extends BreadthCrawler {
     /**
      * @param crawlPath crawlPath is the path of the directory which maintains
      *                  information of this crawler
      * @param autoParse if autoParse is true,BreadthCrawler will auto extract
      *                  links which match regex rules from pag
      */
-    public ManualNewsCrawler(String crawlPath, boolean autoParse) {
+    public DemoManualNewsCrawler(String crawlPath, boolean autoParse) {
         super(crawlPath, autoParse);
-        /*add 10 start pages and set their type to "list"
-          "list" is not a reserved word, you can use other string instead
-         */
-        for(int i = 1; i <= 10; i++) {
-            this.addSeed("http://news.hfut.edu.cn/list-1-" + i + ".html", "list");
+        // add 5 start pages and set their type to "list"
+        //"list" is not a reserved word, you can use other string instead
+        this.addSeedAndReturn("https://blog.github.com/").type("list");
+        for(int pageIndex = 2; pageIndex <= 5; pageIndex++) {
+            String seedUrl = String.format("https://blog.github.com/page/%d/", pageIndex);
+            this.addSeed(seedUrl, "list");
         }
 
         setThreads(50);
         getConf().setTopN(100);
 
-
-//        setResumable(true);
+        //enable resumable mode
+        //setResumable(true);
     }
 
     @Override
@@ -159,12 +193,12 @@ public class ManualNewsCrawler extends BreadthCrawler {
         if (page.matchType("list")) {
             /*if type is "list"*/
             /*detect content page by css selector and mark their types as "content"*/
-            next.add(page.links("div[class=' col-lg-8 '] li>a")).type("content");
+            next.add(page.links("h1.lh-condensed>a")).type("content");
         }else if(page.matchType("content")) {
             /*if type is "content"*/
             /*extract title and content of news by css selector*/
-            String title = page.select("div[id=Article]>h2").first().text();
-            String content = page.selectText("div#artibody", 0);
+            String title = page.select("h1[class=lh-condensed]").first().text();
+            String content = page.selectText("div.content.markdown-body");
 
             //read title_prefix and content_length_limit from configuration
             title = getConf().getString("title_prefix") + title;
@@ -178,7 +212,7 @@ public class ManualNewsCrawler extends BreadthCrawler {
     }
 
     public static void main(String[] args) throws Exception {
-        ManualNewsCrawler crawler = new ManualNewsCrawler("crawl", false);
+        DemoManualNewsCrawler crawler = new DemoManualNewsCrawler("crawl", false);
 
         crawler.getConf().setExecuteInterval(5000);
 
